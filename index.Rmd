@@ -1,0 +1,365 @@
+---
+title: | 
+  ![](Logo_UCO.png){width="10%"}
+  [**MUSHROOM CLASSIFICATION**]{style="color:black;font-family:times new roman; font-size:40px;"}
+  ![](Escudo_del_Grado_de_Biología.png){width="10%"}
+author: | 
+ <span style="color:black; font-family:'Times New Roman'; font-size:20px;">
+  **AUTORES**
+  
+  - *Marina Muñiz Fernández*,  
+  - *Gema Murillo Daimiel*,  
+  - *Manuel Román Marchena*,  
+  - *Álvaro Urdiales Palomo*.
+  </span>
+
+date: |
+  <span style="color:black; font-family:'Times New Roman'; font-size:20px;">
+  **`r Sys.Date()`** 
+output:
+  html_document:
+    toc: true
+    df_print: paged
+    number_sections: true
+    css: estilo.css
+bibliography: ["bibliografia.bib","libraries.bib"]
+link-citations: true
+colorlinks: true
+urlcolor: blue 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Introducción** {style="color:black;font-family:times new roman; font-size:20px;"}
+
+El presente estudio se basa en el conjunto de datos sobre la **clasificación de hongos**, obtenido del repositorio de aprendizaje automático de la Universidad de California en Irvine (UCI) [@mushroom_73] y disponible en [Kaggle](https://www.kaggle.com/datasets/uciml/mushroom-classification/data). Este dataset incluye información categórica correspondiente a 8,124 muestras de hongos, pertenecientes a 23 especies de los géneros *Agaricus y Lepiota*. Los atributos registrados incluyen características observables de los hongos, tales como olor, color y forma del sombrero, tipo de lámina, presencia de manchas, entre otros.
+
+Cada registro está clasificado como **comestible o venenoso**, lo que permite evaluar la relación entre características físicas y toxicidad. La información categórica contenida en el dataset resulta fundamental, ya que cada atributo constituye una variable cualitativa capaz de discriminar entre hongos seguros y potencialmente peligrosos. El análisis de estas variables permite identificar patrones relevantes que pueden servir como base para modelos predictivos, así como para el desarrollo de criterios objetivos de clasificación basados en observaciones directas.
+
+El propósito del estudio es analizar, de manera sistemática, la relación entre los atributos físicos de los hongos y su comestibilidad, utilizando herramientas estadísticas y de aprendizaje automático. Para ello, se emplearon *R y RStudio* [@R-base] con los siguientes objetivos específicos:
+
+-   Realizar un análisis exploratorio de los datos, evaluando la distribución de cada variable categórica y la presencia de posibles patrones o asociaciones.
+
+-   Visualizar relaciones y correlaciones entre los atributos de los hongos mediante técnicas gráficas y tabulares, facilitando la interpretación de los datos.
+
+-   Implementar y evaluar modelos de clasificación que permitan predecir la comestibilidad de los hongos a partir de sus características observables, contribuyendo al entendimiento de los factores que determinan la toxicidad.
+
+El análisis desarrollado proporciona una aproximación cuantitativa y objetiva al estudio de la clasificación de hongos, integrando la exploración de datos categóricos con técnicas de modelado predictivo, lo que resulta útil tanto en contextos de investigación como en aplicaciones prácticas de identificación de hongos [comestibles]{style="color:salmon"} y [venenosos]{style="color:green"}.
+
+A continuación, veremos una primera vista de los datos del dataset con la funcion \`\`\``knitr::kable`\`\`\` del paquete [@R-knitr] ;
+
+```{r leer-archivo, echo=FALSE, warning=FALSE}
+mushrooms <- read.csv("mushrooms.csv")
+```
+
+```{r Primera_vista_datos, message=TRUE, warning=TRUE, echo=FALSE}
+knitr::kable(head(mushrooms, 8), align = 'c', caption = "Tabla 1: Ocho primeras filas")
+```
+
+# **Materiales y Métodos** {style="color:black;font-family:times new roman; font-size:20px;"}
+
+## *Materiales* {style="color:black;font-family:times new roman; font-size:20px;"}
+
+Para el uso del trabajo se empleó un conjunto de datos de setas que contiene información morfológica, sensorial y toxicológica. Para el análisis se seleccionaron tres variables categóricas, consideradas relevantes para la evaluación de la toxicidad:
+
+-   **Class:** Indica si la seta es comestible (e) o venenosa (p). Esta variable constituye el criterio principal, ya que el objetivo es identificar características asociadas a la toxicidad.
+
+-   **Odor:** Describe el tipo de olor de la seta (almendrado, anís, desagradable, picante, sin olor, entre otros). Se trata de una variable categórica con múltiples niveles, representando un rasgo sensorial potencialmente discriminante entre especies.
+
+-   **Bruises:** Indica si la seta se magulla al manipularla (t = sí, f = no). Esta característica fisiológica puede diferenciar setas tóxicas de las no tóxicas.
+
+## *Métodos* {style="color:black;font-family:times new roman; font-size:20px;"}
+
+### Definición de Variables Categóricas {style="color:black;font-family:times new roman; font-size:20px;"}
+
+Se trabaja con las siguientes variables categóricas:
+
+-   **Variable class (clase)**: La variable class indica si una seta es [comestible]{style="red"} (e) o venenosa (p). Es una variable categórica dicotómica que representa la categoría toxicológica del hongo. Constituye la variable de interés principal del estudio, dado que el objetivo consiste en identificar características asociadas a la toxicidad.
+
+-   **Variable odor (olor)**: La variable odor recoge el tipo de olor que presenta cada seta (almendrado, anís, desagradable, picante, sin olor, etc.). Se trata de una variable categórica con múltiples niveles y refleja un rasgo sensorial que, en micología, puede estar relacionado con la identificación y peligrosidad de determinadas especies. Su variabilidad y naturaleza cualitativa permiten analizar si ciertos olores aparecen con mayor frecuencia en setas venenosas que en comestibles.
+
+-   **Variable bruises (moretones o magulladuras)**: La variable bruises indica si la seta se magulla (“t”) o no (“f”) al manipularla. Es también una variable categórica dicotómica. Las magulladuras o cambios de color pueden constituir características fisiológicas relevantes en la identificación de especies y, potencialmente, en la diferenciación entre setas tóxicas y no tóxicas.
+
+### Preparación y organización de los datos {style="color:black;font-family:times new roman; font-size:20px;"}
+
+A continuación, se procedió a la preparación de los datos del dataset [@mushroom_73] con el fin de facilitar los análisis y la visualización. En primer lugar, se utilizó la función select para conservar únicamente las variables bruises, class y odor, consideradas relevantes para el estudio. Para ello, se emplearon funciones de los paquetes dplyr [@R-dplyr] y ggplot2 [@R-ggplot2] [@ggplot22016], los cuales fueron cargados previamente mediante la función library.
+
+```{r dependencias, include=FALSE}
+# Aqui cargamos las librerias que nos haran falta para el desarrollo de nuestro proyecto
+library(dplyr)
+library(ggplot2)
+```
+
+```{r selección de variables, echo=FALSE}
+# Seleccionamos solo las columnas que nos interesan 
+pr_mushroom <- mushrooms %>% 
+  select(class,odor,bruises)
+knitr::kable(head(pr_mushroom, 8), align = 'c', caption = "Tabla 2: Selección de variables")
+```
+
+No obstante, el dataset [@mushroom_73] presenta una estructura poco intuitiva. Por este motivo, se procedió a reemplazar los códigos alfabéticos por descripciones textuales más explícitas, con el fin de facilitar la interpretación y el análisis estadístico de los datos.
+
+```{r procesamiento de nuestro dataset, echo=FALSE}
+# Primero transformamos la columna de clase con ifelse y lo tratamos como factor para nuestro analisis estadistico, donde haya p, sera venenoso, donde no, sera comestible.
+
+pr_mushroom <- pr_mushroom %>%
+  mutate(
+    class = as.factor(ifelse(class == "p", 
+                             "venenoso", 
+                             "comestible")))
+
+# Segundo, hacemos lo mismo con la columna bruises donde t se magulla.
+
+pro_mushroom <- pr_mushroom %>%
+  mutate(
+    bruises = as.factor(ifelse(bruises == "t", 
+                               "Se magulla", 
+                               "No magulla")))
+
+# Por ultimo y mas complicado vamos a hacer lo mismo pero con odor, al ser mas de un olor es bastante laborioso pero seguimos la misma dinámica anterior;
+
+proc_mushroom <- pro_mushroom %>%
+  mutate(
+    odor = as.factor(
+      ifelse(odor == "a", "Almendra",
+             ifelse(odor == "c", "Creosota",
+                    ifelse(odor == "f", "Fétido",
+                           ifelse(odor == "l", "Anís",
+                                  ifelse(odor == "m", "Moho",
+                                         ifelse(odor == "n", "Sin olor",
+                                                ifelse(odor == "p", "Acre",
+                                                       ifelse(odor == "s", "Picante",
+                                                              ifelse(odor == "y", "Pescado", NA)))))))))))
+
+# A continuación plasmamos la tabla correctamente con nuestro nuevo dataset
+knitr::kable(head(proc_mushroom, 10), align = 'c', caption = "Tabla 3: Dataset procesado")
+
+```
+
+```{verbatim}
+# Primero transformamos la columna de clase con ifelse y lo tratamos como factor para nuestro analisis estadistico, donde haya p, sera venenoso, donde no, sera comestible.
+
+pr_mushroom <- pr_mushroom %>%
+  mutate(
+    class = as.factor(ifelse(class == "p", 
+                             "venenoso", 
+                             "comestible")))
+
+# Segundo, hacemos lo mismo con la columna bruises donde t se magulla.
+
+pro_mushroom <- pr_mushroom %>%
+  mutate(
+    bruises = as.factor(ifelse(bruises == "t", 
+                               "Se magulla", 
+                               "No magulla")))
+
+# Por ultimo y mas complicado vamos a hacer lo mismo pero con odor, al ser mas de un olor es bastante laborioso pero seguimos la misma dinámica anterior;
+
+proc_mushroom <- pro_mushroom %>%
+  mutate(
+    odor = as.factor(
+      ifelse(odor == "a", "Almendra",
+             ifelse(odor == "c", "Creosota",
+                    ifelse(odor == "f", "Fétido",
+                           ifelse(odor == "l", "Anís",
+                                  ifelse(odor == "m", "Moho",
+                                         ifelse(odor == "n", "Sin olor",
+                                                ifelse(odor == "p", "Acre",
+                                                       ifelse(odor == "s", "Picante",
+                                                              ifelse(odor == "y", "Pescado", NA)))))))))))
+
+# A continuación plasmamos la tabla correctamente con nuestro nuevo dataset
+knitr::kable(head(proc_mushroom, 10), align = 'c', caption = "Tabla 3: Dataset procesado")
+
+```
+
+### Hipótesis Iniciales {style="color:black;font-family:times new roman; font-size:20px;"}
+
+**Hipótesis 1: class vs odor**
+
+-   *Hipótesis nula (H₀):* La toxicidad de la seta (comestible o venenosa) es independiente del olor que presenta. Es decir, la probabilidad de que una seta sea venenosa es equivalente para todos los tipos de olor, por lo que el olor no proporciona información sobre la clasificación de la seta.
+
+-   *Hipótesis alternativa (H₁):* La toxicidad de la seta depende del olor. La probabilidad de que una seta sea venenosa varía según el tipo de olor, indicando que el olor constituye un factor relevante para la distinción entre setas comestibles y venenosas.
+
+**Hipótesis 2: class vs bruises**
+
+-   *Hipótesis nula (H₀):* La toxicidad de la seta (comestible o venenosa) es independiente de la presencia de magulladuras. La probabilidad de que una seta sea venenosa es la misma tanto si presenta magulladuras como si no, por lo que esta característica no aporta información relevante para la clasificación.
+
+-   *Hipótesis alternativa (H₁):* La toxicidad de la seta depende de la presencia de magulladuras. La probabilidad de que una seta sea venenosa varía según si la seta presenta o no magulladuras, indicando que esta variable constituye un factor relevante para la distinción entre setas comestibles y venenosas.
+
+### Método de Análisis Estadístico {style="color:black;font-family:times new roman; font-size:20px;"}
+
+Para evaluar la relación entre las variables consideradas y la toxicidad de las setas, se emplea **el test de Chi-cuadrado de independencia**, un procedimiento estadístico ampliamente utilizado para analizar asociaciones entre *variables categóricas*. Todas las variables involucradas en este estudio, tales como el olor y la presencia de magulladuras, son de tipo *categórico*, lo que permite clasificar las observaciones en diferentes categorías y analizar comparativamente su distribución en función de la toxicidad de la seta.
+
+El test de **Chi-cuadrado** se basa en la comparación entre las frecuencias observadas en las tablas de contingencia y las frecuencias esperadas bajo la hipótesis de independencia, es decir, bajo la suposición de que no existe relación entre la variable de interés y la toxicidad. La magnitud de la discrepancia entre frecuencias observadas y esperadas permite determinar si la distribución de las categorías difiere de manera significativa de lo que se esperaría por azar.
+
+La utilización de *variables categóricas* en este contexto es fundamental, ya que características como el olor y la presencia de magulladuras constituyen atributos discretos que pueden tener un papel determinante en la identificación de setas comestibles o venenosas. Analizar estas variables permite no solo verificar la existencia de asociaciones significativas, sino también identificar patrones que podrían ser relevantes para el desarrollo de modelos predictivos o guías de clasificación basadas en características observables.
+
+### Chi-cuadrado {style="color:black;font-family:times new roman; font-size:20px;"}
+
+Para llevar a cabo el test de Chi-cuadrado en R, el primer paso consiste en construir una tabla de contingencia que recoja las frecuencias observadas para cada combinación de categorías de las variables analizadas. Esto se realiza mediante la función `table`, que permite resumir de forma estructurada la distribución conjunta de dos variables categóricas. A partir de esta tabla, el test se aplica directamente con la función `chisq.test()`, que calcula el estadístico Chi-cuadrado, los grados de libertad y el valor p asociado.
+
+Se generaron tablas mediante la función knitr [@R-knitr] con el objetivo de visualizar la información de manera más estructurada y práctica.
+
+```{r asociación de las variables en tablas de contingencia, echo=FALSE}
+#Tabla de contingencia de clase vs olor 
+tabla_odor <- table(proc_mushroom$class, proc_mushroom$odor)
+knitr::kable(tabla_odor, align = 'c', caption = "Tabla 4: tabla de contingencia olor vs clase")
+#Tabla de contingencia de clase vs bruises
+tabla_bruises <- table(proc_mushroom$class, proc_mushroom$bruises)
+knitr::kable(tabla_bruises, align = 'c', caption = "Tabla 5: tabla de contingencia bruises vs clase")
+```
+
+Estas tablas permiten observar la distribución conjunta de ambas variables. En las filas se presentan las diferentes clases de toxicidad ("venenoso" o "comestible"), mientras que en las columnas se representan las variables bruises y odor.
+
+### Criterio de decisión {style="color:black;font-family:times new roman; font-size:20px;"}
+
+Se estableció un nivel de significación de α = 0.05. La interpretación se realizó de la siguiente manera:
+
+-   Si p ≤ 0.05: Se rechaza H₀, indicando la existencia de una relación significativa entre las variables.
+
+-   Si p \> 0.05: No se rechaza H₀, lo que indica ausencia de evidencia para afirmar la relación entre las variables.
+
+# **Resultados** {style="color:black;font-family:times new roman; font-size:20px;"}
+
+Los resultados obtenidos a partir de los tests de Chi-cuadrado de independencia indican que, en ambas comparaciones, los valores p son menores que 0,05, lo que implica el rechazo de la hipótesis nula (H₀) en los dos casos.
+
+## Class vs Bruises {style="color:black;font-family:times new roman; font-size:20px;"}
+
+```{r test_estadistico, echo=FALSE, message=FALSE, warning=FALSE}
+
+#Realizamos nuestro test estadístico con nuestra tabla de contingencia bruises y para dejarlo de una manera mas bonita en nuestro html usamos la función broom tidy que vimos y lo representamos con knitr.
+chi_bruises <- broom::tidy(chisq.test(tabla_bruises))
+
+chi_bruises$p.value <- "< 2.2e-16"
+
+knitr::kable(
+  chi_bruises,
+  align = "c",
+  caption = "Tabla 7: Resultados del test Chi-cuadrado para class vs bruises") 
+```
+
+```{r grafica class vs bruises, echo=FALSE, message=FALSE, warning=FALSE}
+proc_mushroom %>% 
+  ggplot(aes(x = class, fill = bruises)) +
+  geom_bar() +
+  labs(
+    title = "Magullamiento según toxicidad",
+    x = "Clase de seta",
+    y = "Nº de setas",
+    fill = "Magullamiento"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("No magulla"="lavender", "Se magulla"="purple") )
+```
+
+El valor p menor de 0,05 permite concluir que la toxicidad depende de la presencia o ausencia de magulladuras. La distribución de esta característica no es aleatoria, sino que se asocia significativamente con la clasificación de la seta como venenosa o comestible. Por tanto, las magulladuras representan una variable útil para la distinción entre ambos tipos de hongos. En nuestro caso, concluimos que las magulladuras son bastante típicas de las setas que son comestibles.
+
+### Test de Fisher Class vs Bruises {style="color:black;font-family:times new roman; font-size:20px;"}
+
+```{r test_fisher, echo=FALSE, results='hide'}
+fisher_bruises <- fisher.test(tabla_bruises)
+fisher_bruises
+```
+
+```{r representacion_fisher_bruises, echo=FALSE, message=FALSE, warning=FALSE}
+# Test de Fisher
+fisher_bruises <- broom::tidy(fisher.test(tabla_bruises))
+
+# Formatear el p-valor como texto en notación científica
+fisher_bruises$p.value <- "< 2.2e-16"
+
+# Mostrar la tabla con kable
+knitr::kable(
+  fisher_bruises,
+  align = "c",
+  caption = "Tabla: Resultados del test de Fisher para class vs bruises")
+```
+
+El test de Fisher se empleó como método complementario para evaluar la asociación entre dos variables categóricas. En este caso, se analizó si la toxicidad de las setas está relacionada con la presencia de magulladuras. Dado que el valor de p es menor a 0,05, se concluye que existe una relación estadísticamente significativa entre ambas variables, indicando que la presencia de magulladuras se asocia de manera consistente con la clase de toxicidad de la seta.
+
+## Class vs Odor {style="color:black;font-family:times new roman; font-size:20px;"}
+
+```{r test estadistico, message=FALSE, warning=FALSE, echo=FALSE}
+chi_odor <- broom::tidy(chisq.test(tabla_odor))
+
+chi_odor$p.value <- "< 2.2e-16"
+
+knitr::kable(
+  chi_odor,
+  align = "c",
+  caption = "Tabla 8: Resultados del test Chi-cuadrado para class vs odor") 
+```
+
+Con el fin de reforzar la hipótesis planteada, la variable odor se transformó en dos categorías generales: presencia de olor y ausencia de olor. Esta simplificación permite centrar el análisis en la influencia global de la presencia de olor sobre la toxicidad de las setas, sin evaluar diferencias entre tipos específicos de olor.
+
+La representación gráfica de la variable original, compuesta por múltiples categorías, resulta menos intuitiva y dificulta la identificación visual de patrones claros, especialmente cuando el objetivo es evaluar una relación general entre olor y toxicidad. En cambio, el uso de una variable binaria facilita la comparación directa entre grupos, mejora la claridad visual del gráfico y refuerza la coherencia entre el análisis estadístico y la hipótesis de investigación planteada.
+
+```{r Grafica y asignacion binaria, echo=FALSE, message=FALSE, warning=FALSE}
+#En primer lugar, lo que hemos hecho es convertir en binario nuestra variable olor
+olor_binario <- proc_mushroom %>%
+  mutate(
+    odor = as.factor(
+      ifelse(odor == "Sin olor", "Sin olor", "Con olor")))
+#Ahora podemos realizar nuestra gráfica
+olor_binario %>% 
+  ggplot(aes(x = odor, fill = class)) +
+  geom_bar() +
+  labs(
+    title = "Distribución del olor según la toxicidad",
+    x = "Presencia de olor",
+    y = "Número de setas",
+    fill = "Clase"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(
+    values = c(
+      "comestible" = "lavender",
+      "venenoso"   = "purple"))
+```
+
+El valor p inferior a 0,05 evidencia que la toxicidad de la seta depende del olor. Esto indica que ciertos tipos de olor se presentan con mayor frecuencia en setas venenosas en comparación con las comestibles. En consecuencia, el olor constituye una característica relevante y discriminante para la diferenciación de setas tóxicas y no tóxicas.
+
+Una vez obtenida una representación gráfica simplificada de la variable odor, se emplea su forma original con múltiples categorías para profundizar en el análisis de las diferencias observadas. Esta aproximación permite examinar de manera más detallada cómo se distribuyen los distintos tipos de olor en función de la toxicidad de las setas, aportando una visión complementaria al análisis binario previo.
+
+```{r Representacion completa de la variable odor, echo=FALSE, message=FALSE, warning=FALSE}
+proc_mushroom %>% 
+  ggplot(aes(x = odor, fill = class)) +
+  geom_bar() +
+  labs(
+    title = "Distribución del olor según la toxicidad",
+    x = "Olor",
+    y = "Número de setas",
+    fill = "Clase"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(
+    values = c(
+      "comestible" = "lavender",
+      "venenoso"   = "purple"))
+```
+
+La representación gráfica de la variable odor desagregada en todas sus categorías facilita la identificación de patrones específicos que no pueden apreciarse cuando se consideran únicamente dos grupos generales. De este modo, aunque la recodificación binaria resulta útil para evaluar la relación global entre olor y toxicidad, el análisis detallado por tipos de olor permite interpretar con mayor precisión qué características sensoriales se asocian de forma más marcada a setas comestibles o venenosas, enriqueciendo la interpretación de los resultados obtenidos.
+
+# **Conclusión** {style="color:black;font-family:times new roman; font-size:20px;"}
+
+El análisis realizado sobre el conjunto de datos de hongos ha permitido evaluar de manera sistemática la relación entre las características morfológicas y sensoriales de las setas y su clasificación como comestibles o venenosas. La preparación y transformación de las variables categóricas class, bruises y odor, facilitó la interpretación de los datos, convirtiendo códigos alfabéticos en descripciones significativas y estructurando la información para su análisis estadístico.
+
+Los resultados de las tablas de contingencia y los tests de independencia, incluyendo el Chi-cuadrado y el test de Fisher, indican que existe una asociación significativa entre la toxicidad de las setas y las variables consideradas. En particular:
+
+-   La presencia o ausencia de magulladuras (bruises) mostró una relación estadísticamente significativa con la clase del hongo, permitiendo diferenciar de manera consistente entre setas comestibles y venenosas.
+
+-   La variable odor también se asoció de manera significativa con la toxicidad, evidenciando que ciertos tipos de olor son más frecuentes en setas venenosas que en comestibles. La representación completa de los distintos tipos de olor aportó un análisis más detallado de las diferencias observadas, permitiendo corroborar la relación global.
+
+Los procedimientos implementados, que incluyen la transformación de variables, la generación de tablas de contingencia y la aplicación de tests estadísticos adecuados para variables categóricas, proporcionan un marco metodológico riguroso para la identificación de factores discriminantes en hongos. Asimismo, las visualizaciones gráficas refuerzan la interpretación de los resultados y permiten una evaluación clara de los patrones presentes en los datos.
+
+Para finalizar, tanto el olor como la presencia de magulladuras y moretones constituyen variables relevantes para la clasificación de setas, mostrando una asociación estadísticamente significativa con la toxicidad. Estos hallazgos respaldan la utilidad de las características morfológicas y sensoriales como criterios objetivos en la identificación de hongos comestibles y venenosos, contribuyendo a la comprensión de los factores que determinan la seguridad en su consumo y proporcionando una base sólida para estudios predictivos y aplicaciones prácticas en micología.
+
+# **Referencias Bibliográficas e información de sesión** {style="color:black;font-family:times new roman; font-size:20px;"}
+
+```{r sessionInfo, echo=FALSE}
+session <- sessionInfo()
+print(session)
+```
