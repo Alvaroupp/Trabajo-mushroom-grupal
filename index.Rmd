@@ -280,7 +280,9 @@ knitr::kable(
   caption = "Tabla: Resultados del test de Fisher para class vs bruises")
 ```
 
-El test de Fisher se empleó como método complementario para evaluar la asociación entre dos variables categóricas. En este caso, se analizó si la toxicidad de las setas está relacionada con la presencia de magulladuras. Dado que el valor de p es menor a 0,05, se concluye que existe una relación estadísticamente significativa entre ambas variables, indicando que la presencia de magulladuras se asocia de manera consistente con la clase de toxicidad de la seta.
+El test de Fisher lo usamos para analizar la relación entre dos variables categóricas mediante tablas de contingencia. Es especialmente adecuado cuando el tamaño muestral es pequeño (por eso quizas es mejor chi) o cuando existen frecuencias esperadas bajas, ya que calcula la probabilidad exacta sin depender de aproximaciones. Por ello, permite contrastar la independencia entre variables categóricas de forma válida en estas condiciones. En nuestro caso no ha dado problemas ya que nos sale el mismo p valor.
+
+Dado que el valor de p es menor a 0,05, se concluye que existe una relación estadísticamente significativa entre ambas variables, indicando que la presencia de magulladuras se asocia de manera consistente con la clase de toxicidad de la seta.
 
 ## Class vs Odor {style="color:black;font-family:times new roman; font-size:20px;"}
 
