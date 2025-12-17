@@ -58,6 +58,8 @@ mushrooms <- read.csv("mushrooms.csv")
 knitr::kable(head(mushrooms, 8), align = 'c', caption = "Tabla 1: Ocho primeras filas")
 ```
 
+Nuestro dataset presenta `r nrow(mushrooms)` filas `r ncol(mushrooms)` columnas, en nuestra tabla solo mostramos las 8 primeras filas.
+
 # **Materiales y Métodos** {style="color:black;font-family:times new roman; font-size:20px;"}
 
 ## *Materiales* {style="color:black;font-family:times new roman; font-size:20px;"}
