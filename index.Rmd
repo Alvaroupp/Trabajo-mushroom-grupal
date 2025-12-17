@@ -64,11 +64,11 @@ knitr::kable(head(mushrooms, 8), align = 'c', caption = "Tabla 1: Ocho primeras 
 
 Para el uso del trabajo se empleó un conjunto de datos de setas que contiene información morfológica, sensorial y toxicológica. Para el análisis se seleccionaron tres variables categóricas, consideradas relevantes para la evaluación de la toxicidad:
 
--   **Class:** Indica si la seta es comestible (e) o venenosa (p). Esta variable constituye el criterio principal, ya que el objetivo es identificar características asociadas a la toxicidad.
+-   **Class**
 
--   **Odor:** Describe el tipo de olor de la seta (almendrado, anís, desagradable, picante, sin olor, entre otros). Se trata de una variable categórica con múltiples niveles, representando un rasgo sensorial potencialmente discriminante entre especies.
+-   **Odor**
 
--   **Bruises:** Indica si la seta se magulla al manipularla (t = sí, f = no). Esta característica fisiológica puede diferenciar setas tóxicas de las no tóxicas.
+-   **Bruises**
 
 ## *Métodos* {style="color:black;font-family:times new roman; font-size:20px;"}
 
@@ -224,7 +224,7 @@ Se estableció un nivel de significación de α = 0.05. La interpretación se re
 
 # **Resultados** {style="color:black;font-family:times new roman; font-size:20px;"}
 
-Los resultados obtenidos a partir de los tests de Chi-cuadrado de independencia indican que, en ambas comparaciones, los valores p son menores que 0,05, lo que implica el rechazo de la hipótesis nula (H₀) en los dos casos.
+Los resultados obtenidos a partir de los tests de Chi-cuadrado de independencia indican que, en ambas comparaciones, los valores p son menores que 0,05, lo que implica el rechazo de la hipótesis nula (H₀) en los dos casos. A continuación representaremos los resultados, con tablas hechas a partir de `knitr` y `broom::tidy`
 
 ## Class vs Bruises {style="color:black;font-family:times new roman; font-size:20px;"}
 

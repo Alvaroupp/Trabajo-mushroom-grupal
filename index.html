@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-12-16" />
+<meta name="date" content="2025-12-17" />
 
 <title> MUSHROOM CLASSIFICATION </title>
 
@@ -1658,7 +1658,7 @@ CLASSIFICATION</strong></span> <img role="img" src="data:image/png;base64,iVBORw
 <li><em>Álvaro Urdiales Palomo</em>. </span></li>
 </ul></h4>
 <h4 class="date"><p><span style="color:black; font-family:&#39;Times New Roman&#39;; font-size:20px;">
-<strong>2025-12-16</strong></p></h4>
+<strong>2025-12-17</strong></p></h4>
 
 </div>
 
@@ -2013,17 +2013,9 @@ contiene información morfológica, sensorial y toxicológica. Para el
 análisis se seleccionaron tres variables categóricas, consideradas
 relevantes para la evaluación de la toxicidad:</p>
 <ul>
-<li><p><strong>Class:</strong> Indica si la seta es comestible (e) o
-venenosa (p). Esta variable constituye el criterio principal, ya que el
-objetivo es identificar características asociadas a la
-toxicidad.</p></li>
-<li><p><strong>Odor:</strong> Describe el tipo de olor de la seta
-(almendrado, anís, desagradable, picante, sin olor, entre otros). Se
-trata de una variable categórica con múltiples niveles, representando un
-rasgo sensorial potencialmente discriminante entre especies.</p></li>
-<li><p><strong>Bruises:</strong> Indica si la seta se magulla al
-manipularla (t = sí, f = no). Esta característica fisiológica puede
-diferenciar setas tóxicas de las no tóxicas.</p></li>
+<li><p><strong>Class</strong></p></li>
+<li><p><strong>Odor</strong></p></li>
+<li><p><strong>Bruises</strong></p></li>
 </ul>
 </div>
 <div id="métodos" class="section level2" number="2.2" style="color:black;font-family:times new roman; font-size:20px;">
@@ -2394,7 +2386,8 @@ evidencia para afirmar la relación entre las variables.</p></li>
 <p>Los resultados obtenidos a partir de los tests de Chi-cuadrado de
 independencia indican que, en ambas comparaciones, los valores p son
 menores que 0,05, lo que implica el rechazo de la hipótesis nula (H₀) en
-los dos casos.</p>
+los dos casos. A continuación representaremos los resultados, con tablas
+hechas a partir de <code>knitr</code> y <code>broom::tidy</code></p>
 <div id="class-vs-bruises" class="section level2" number="3.1" style="color:black;font-family:times new roman; font-size:20px;">
 <h2 style="color:black;font-family:times new roman; font-size:20px;"><span class="header-section-number">3.1</span> Class vs Bruises</h2>
 <table>
