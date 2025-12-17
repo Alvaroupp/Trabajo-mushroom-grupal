@@ -285,6 +285,8 @@ El test de Fisher se empleó como método complementario para evaluar la asociac
 ```{r test estadistico, message=FALSE, warning=FALSE, echo=FALSE}
 chi_odor <- broom::tidy(chisq.test(tabla_odor))
 
+## forzamos a que de ese p valor porque si lo hacemos directo lo redondea a 0, pero ese p valor es el que da real en el chiqtest
+
 chi_odor$p.value <- "< 2.2e-16"
 
 knitr::kable(
